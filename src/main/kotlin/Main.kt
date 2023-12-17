@@ -35,6 +35,42 @@ fun main(args: Array<String>) {
                 println(User(id = userId, name = userName, age = userAge?.toIntOrNull() ?: -1))
             }
 
+            2 -> {
+                println()
+                print("Enter user Id: ")
+                val userId = readln()
+                println()
+                print("Enter user Name: ")
+                val userName = readln()
+                println()
+                print("Enter user Age: ")
+                val userAge = readlnOrNull()
+                println()
+                println("UserId : $userId, userName : $userName, userAge : $userAge ")
+                val user = User(id = userId, name = userName, age = userAge?.toIntOrNull() ?: -1)
+                socialNetworkManager.addUser(user)
+
+                print("Enter id of user you want to friend with: ")
+                val userIdToFriendReq = readlnOrNull()
+                println()
+                socialNetworkManager.addFriend(userIdToFriendReq ?: "", user)
+            }
+
+            10 -> {
+                socialNetworkManager.users.filter {
+                    val user = it.value
+                    user.friends?.size!! > 0
+                }.forEach { (userId, user) ->
+                    user.friends?.forEach {
+                        println("${user.name} has a friend by the name ${it.name}")
+                    }
+
+                }
+                println()
+                println()
+            }
+
+
             11 -> break
 
         }
