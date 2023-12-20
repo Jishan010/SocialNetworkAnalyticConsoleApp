@@ -1,4 +1,4 @@
-import java.sql.Timestamp
+import java.time.Instant
 
 fun main(args: Array<String>) {
     val socialNetworkManager = SocialNetwork()
@@ -23,10 +23,8 @@ fun main(args: Array<String>) {
                 println()
                 print("Enter user Id: ")
                 val userId = readln()
-                println()
                 print("Enter user Name: ")
                 val userName = readln()
-                println()
                 print("Enter user Age: ")
                 val userAge = readlnOrNull()
                 println()
@@ -39,10 +37,8 @@ fun main(args: Array<String>) {
                 println()
                 print("Enter user Id: ")
                 val userId = readln()
-                println()
                 print("Enter user Name: ")
                 val userName = readln()
-                println()
                 print("Enter user Age: ")
                 val userAge = readlnOrNull()
                 println()
@@ -54,6 +50,59 @@ fun main(args: Array<String>) {
                 val userIdToFriendReq = readlnOrNull()
                 println()
                 socialNetworkManager.addFriend(userIdToFriendReq ?: "", user)
+            }
+
+            3 -> {
+                println()
+                print("Enter user Id: ")
+                val userId = readln()
+
+                print("Enter post Id: ")
+                val postId = readln()
+
+                val post = Post(
+                    postId = postId.toLong(),
+                    postContent = "This is my first Post",
+                    timestamp = Instant.now(),
+                    comments = mutableListOf()
+                )
+                socialNetworkManager.addPost(userId, post)
+            }
+
+            4 -> {
+                println()
+                print("Enter user your Id: ")
+                val userId = readln()
+
+                print("Enter the Id of postOwner: ")
+                val postOwnerId = readln()
+
+                print("Enter the Post Id: ")
+                val postId = readln()
+
+                val comment = Comment(
+                    userId = userId, commentId = 1, comment = "This is my testing comment", timestamp = Instant.now()
+                )
+
+                socialNetworkManager.addComment(postOwnerId = postOwnerId, postId = postId.toLong(), comment = comment)
+            }
+
+            5 -> {
+                print("Enter user Id: ")
+                val userId = readln()
+                println()
+                val posts = socialNetworkManager.getPostsByUser(userId)
+                posts?.forEach {
+                    println(it.second)
+                }
+            }
+
+            7 -> {
+                println()
+                val posts = socialNetworkManager.getPostsCountPerUser()
+                for ((userId, postCount) in posts) {
+                    println("$userId -> has $postCount number of posts")
+                }
             }
 
             10 -> {
@@ -97,8 +146,8 @@ class SocialNetwork() {
     }
 
     fun addComment(postOwnerId: String, postId: Long, comment: Comment) {
-        val postuser = users[postOwnerId]
-        val post = postuser?.posts?.get(postId)
+        val postUser = users[postOwnerId]
+        val post = postUser?.posts?.get(postId)
         post?.comments?.add(comment)
     }
 
@@ -124,10 +173,12 @@ class SocialNetwork() {
         return user?.posts?.size
     }
 
-    fun getPostsCountPerUser() {
-        val postCounts = users.values.map { user: User ->
-            user.posts?.size
+    fun getPostsCountPerUser(): MutableMap<String, Int> {
+        val postCountPerUser = mutableMapOf<String, Int>()
+        users.values.forEach {
+            postCountPerUser[it.id] = it.posts?.size ?: 0
         }
+        return postCountPerUser
     }
 
 }
@@ -140,6 +191,6 @@ data class User(
     var posts: MutableMap<Long, Post>? = mutableMapOf(),
 )
 
-data class Post(val postId: Long, val postContent: String, val timestamp: Timestamp, val comments: MutableList<Comment>)
+data class Post(val postId: Long, val postContent: String, val timestamp: Instant, val comments: MutableList<Comment>)
 
-data class Comment(val commentId: Long, val timestamp: Timestamp)
+data class Comment(val userId: String, val commentId: Long, val comment: String, val timestamp: Instant)
